@@ -1,0 +1,161 @@
+make: Nothing to be done for 'all'.
+
+building.pgm
+Host processing time: 10.873000 (ms)
+OpenMP processing time: 3.304000 (ms)
+images are identical
+Host processing time: 11.066000 (ms)
+OpenMP processing time: 3.321000 (ms)
+images are identical
+Host processing time: 11.218000 (ms)
+OpenMP processing time: 3.865000 (ms)
+images are identical
+Host processing time: 11.236000 (ms)
+OpenMP processing time: 3.247000 (ms)
+images are identical
+Host processing time: 11.143000 (ms)
+OpenMP processing time: 3.349000 (ms)
+images are identical
+Host processing time: 11.251000 (ms)
+OpenMP processing time: 3.390000 (ms)
+images are identical
+Host processing time: 11.115000 (ms)
+OpenMP processing time: 3.285000 (ms)
+images are identical
+Host processing time: 11.043000 (ms)
+OpenMP processing time: 3.299000 (ms)
+images are identical
+Host processing time: 11.234000 (ms)
+OpenMP processing time: 3.252000 (ms)
+images are identical
+Host processing time: 10.978000 (ms)
+OpenMP processing time: 3.477000 (ms)
+images are identical
+
+chessBig.pgm
+Host processing time: 55.746000 (ms)
+OpenMP processing time: 16.572000 (ms)
+images are identical
+Host processing time: 55.371000 (ms)
+OpenMP processing time: 16.911000 (ms)
+images are identical
+Host processing time: 55.322000 (ms)
+OpenMP processing time: 16.435000 (ms)
+images are identical
+Host processing time: 54.923000 (ms)
+OpenMP processing time: 16.654000 (ms)
+images are identical
+Host processing time: 55.654000 (ms)
+OpenMP processing time: 16.548000 (ms)
+images are identical
+Host processing time: 56.611000 (ms)
+OpenMP processing time: 16.242000 (ms)
+images are identical
+Host processing time: 56.717000 (ms)
+OpenMP processing time: 16.669000 (ms)
+images are identical
+Host processing time: 55.304000 (ms)
+OpenMP processing time: 16.570000 (ms)
+images are identical
+Host processing time: 55.035000 (ms)
+OpenMP processing time: 16.852000 (ms)
+images are identical
+Host processing time: 56.343000 (ms)
+OpenMP processing time: 16.147000 (ms)
+images are identical
+
+chessRotate1.pgm
+Host processing time: 1.188000 (ms)
+OpenMP processing time: 0.498000 (ms)
+images are identical
+Host processing time: 1.226000 (ms)
+OpenMP processing time: 0.528000 (ms)
+images are identical
+Host processing time: 1.151000 (ms)
+OpenMP processing time: 0.450000 (ms)
+images are identical
+Host processing time: 1.132000 (ms)
+OpenMP processing time: 1.081000 (ms)
+images are identical
+Host processing time: 1.303000 (ms)
+OpenMP processing time: 0.720000 (ms)
+images are identical
+Host processing time: 1.169000 (ms)
+OpenMP processing time: 0.697000 (ms)
+images are identical
+Host processing time: 1.205000 (ms)
+OpenMP processing time: 0.456000 (ms)
+images are identical
+Host processing time: 1.195000 (ms)
+OpenMP processing time: 0.487000 (ms)
+images are identical
+Host processing time: 1.141000 (ms)
+OpenMP processing time: 0.433000 (ms)
+images are identical
+Host processing time: 1.119000 (ms)
+OpenMP processing time: 0.430000 (ms)
+images are identical
+
+house.pgm
+Host processing time: 3.134000 (ms)
+OpenMP processing time: 1.265000 (ms)
+images are identical
+Host processing time: 3.383000 (ms)
+OpenMP processing time: 1.107000 (ms)
+images are identical
+Host processing time: 3.187000 (ms)
+OpenMP processing time: 1.082000 (ms)
+images are identical
+Host processing time: 3.199000 (ms)
+OpenMP processing time: 1.118000 (ms)
+images are identical
+Host processing time: 3.194000 (ms)
+OpenMP processing time: 1.080000 (ms)
+images are identical
+Host processing time: 3.162000 (ms)
+OpenMP processing time: 1.086000 (ms)
+images are identical
+Host processing time: 3.243000 (ms)
+OpenMP processing time: 1.097000 (ms)
+images are identical
+Host processing time: 3.163000 (ms)
+OpenMP processing time: 1.137000 (ms)
+images are identical
+Host processing time: 3.193000 (ms)
+OpenMP processing time: 1.090000 (ms)
+images are identical
+Host processing time: 3.174000 (ms)
+OpenMP processing time: 1.079000 (ms)
+images are identical
+
+squares.pgm
+Host processing time: 1.867000 (ms)
+OpenMP processing time: 0.648000 (ms)
+images are identical
+Host processing time: 1.861000 (ms)
+OpenMP processing time: 0.674000 (ms)
+images are identical
+Host processing time: 2.015000 (ms)
+OpenMP processing time: 0.664000 (ms)
+images are identical
+Host processing time: 1.862000 (ms)
+OpenMP processing time: 0.682000 (ms)
+images are identical
+Host processing time: 1.972000 (ms)
+OpenMP processing time: 1.141000 (ms)
+images are identical
+Host processing time: 1.885000 (ms)
+OpenMP processing time: 0.637000 (ms)
+images are identical
+Host processing time: 1.857000 (ms)
+OpenMP processing time: 1.209000 (ms)
+images are identical
+Host processing time: 1.814000 (ms)
+OpenMP processing time: 0.722000 (ms)
+images are identical
+Host processing time: 1.825000 (ms)
+OpenMP processing time: 0.658000 (ms)
+images are identical
+Host processing time: 1.829000 (ms)
+OpenMP processing time: 0.745000 (ms)
+images are identical

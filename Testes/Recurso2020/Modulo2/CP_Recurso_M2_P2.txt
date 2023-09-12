@@ -1,0 +1,49 @@
+*** --- Prob2 --- ***
+
+/* int MPI_Type_vector(int count, int blocklength, int stride,
+						MPI_Datatype oldtype, MPI_Datatype *newtype)
+	count -> number of blocks (non-negative integer)
+	blocklengsth -> number of elements in each block (non-negative integer)
+	stride -> number of elements between start of each block (integer) */
+
+/* int MPI_Send(const void* buf, int count, MPI_Datatype datatype, int dest,
+				int tag, MPI_Comm comm) */
+
+a) os primeiros 50 elementos da coluna 6;
+
+MPI_Datatype vtype;
+MPI_Type_vector(50, 1, 100, MPI_INT, &atype);
+MPI_Type_commit(&atype);
+
+MPI_Send(a[0][5], 1, atype, 1, 0, MPI_COMM_WORLD);
+MPI_Type_free(&atype);
+
+b) as linhas 0, 2, 4, ... , 98;
+
+MPI_Datatype btype;
+MPI_Type_vector(50, 100, 200, MPI_INT, &btype);
+MPI_Type_commit(&btype);
+
+MPI_Send(a[0][0], 1, btype, 1, 1, MPI_COMM_WORLD);
+MPI_Type_free(&btype);
+
+c) as colunas 1, 3, 4, ... , 99;
+
+MPI_Datatype ctype;
+int count = 100*50; // 100 elementos em cada coluna * 50 colunas
+MPI_Type_vector(count, 1, 2, MPI_INT, &ctype);
+MPI_Type_commit(&ctype);
+
+MPI_Send(a[0][1], 1, ctype, 1, 2, MPI_COMM_WORLD);
+MPI_Type_free(&ctype);
+
+d) todos os elementos da diagonal principal.
+
+MPI_Datatype dtype;
+MPI_Type_vector(100, 1, 101, MPI_INT, &dtype);
+MPI_Type_commit(&dtype);
+
+MPI_Send(a[0][0], 1, dtype, 1, 3, MPI_COMM_WORLD);
+MPI_Type_free(&dtype);
+
+

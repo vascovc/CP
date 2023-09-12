@@ -1,0 +1,143 @@
+*** --- Prob3 --- ***
+
+a) 
+
+int newid, left, right;
+MPI_Comm_rank(comm1, &newid);
+
+/* int MPI_Cart_shift(MPI_Comm comm, int direction, int disp, int *rank_source, 
+						int *rank_dest)
+comm -> communicator with Cartesian structure (handle)
+direction -> coordinate dimension of shift (integer)
+disp -> displacement (> 0: upwards shift [сдвиг вверх], < 0: downwards shift) (integer)
+rank_source -> rank of source process (integer)
+rank_dest -> rank of destination process (integer) 
+
+The 'direction' argument indicates the coordinate dimension to be traversed by the shift.
+The dimensions are numbered from 0 to ndims-1, where ndims is the number of dimensions.
+*/
+MPI_Cart_shift(comm1, 0, 1, &left, &right);
+
+b)
+Os Processos 0 (P0) e 3 (P3) têm 10001 colunas dos quais são responsáveis por atualizar 9999 
+pontos, pois inclui-se o ponto da fronteira à esquerda em relação ao P0 e o da direita em 
+relação ao P3, enquanto que a coluna extra que perfaz as 10001 colunas, serve para guardar o
+ghost points do vizinho à direita do P0 e o do vizinho à esquerda do P3.
+
+Os P1 e P2 têm 10002 colunas dos quais são responsáveis por atualizar 10000 pontos, enquanto que
+as colunas extra que perfazem as 10002 colunas, servem para guardar os ghost points dos vizinhos
+à esquerda e à direita de cada um dos processos.
+
+c)
+/* cols -> contém o valor do número de colunas de 'Tlocal' */
+/* O P0 lê inicialmente um array 'perfilinicial' com os Nx valores da temperatura no instante 
+inicial i = 0 */
+
+int mystart = 1;
+if (newid == 0) 
+	mystart = 0;
+/* int MPI_Scatter(const void* sendbuf, int sendcount, MPI_Datatype sendtype, void* recvbuf, 
+					int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) 
+sendcount -> number of elements sent to each process (non-negative integer, significant only at root)
+*/
+MPI_Scatter(&perfilinicial, Nx/4, MPI_DOUBLE, &Tlocal[0][mystart], Nx/4, MPI_DOUBLE, 0, comm1);
+
+/* int MPI_Sendrecv(const void *sendbuf, 
+					int sendcount, 
+					MPI_Datatype sendtype,
+					int dest, 
+					int sendtag,
+
+					void *recvbuf, 
+					int recvcount,
+					MPI_Datatype recvtype, 
+					int source, 
+					int recvtag, 
+					
+					MPI_Comm comm,
+					MPI_Status *status) 
+*/
+MPI_Sendrecv(&Tlocal[0][cols-2], 1, MPI_DOUBLE, right, 0, 
+			 &Tlocal[0][0], 1, MPI_DOUBLE, left, 0, 
+			comm1, MPI_STATUS_IGNORE);
+
+MPI_Sendrecv(&Tlocal[0][1], 1, MPI_DOUBLE, left, 1, 
+			 &Tlocal[0][cols-1], 1, MPI_DOUBLE, right, 1, 
+			comm1, MPI_STATUS_IGNORE);
+
+O MPI_Scatter() pega no array 'perfilinicial' que contém os valores iniciais da temperatura ao
+longo da barra, divide-o em 4 partes de tamanho Nx/4=10000 e distribui uma parte para cada 
+processo no comunicador 'comm1' conforme o seu 'rank', i.e., 
+	P0 recebe os valores perfilinicial[0:9999]
+	P1 recebe os valores perfilinicial[10000:19999]
+	P2 recebe os valores perfilinicial[20000:29999]
+	P3 recebe os valores perfilinicial[30000:39999]
+Estes valores guardam-se no array 'Tlocal' de cada processo começando no indice Tlocal[0][mystart]. 
+É de salientar que para o P0 mystart=0 enquanto para os restantes mystart=1. Isto deve-se ao
+facto que a coluna 0 do array 'Tlocal' do P0 diz respeito à CF, por outro lado a mesma coluna
+nos outros processos diz respeito à ghost points provinientes do processo à sua esquerda.
+Apesar de todos o processos executarem esta instrução, apenas o P0 irá efetuar a distribuição 
+e o envio, enquanto os restantes processos, incluindo o próprio P0, irão receber dados.
+
+O 1º MPI_Sendrecv() pega no valor mais à direita, excluindo ghost points, de cada array 'Tlocal'
+de cada processo e envia-o para o processo vizinho da direita, e em simultâneo cada processo 
+guarda na posição mais à esquerda do mesmo array o valor que recebe do seu vizinho à esquerda 
+(este valor considera-se um ghost point para o processo que recebe).
+
+O 2º MPI_Sendrecv() pega no valor mais à esquerda, excluindo ghost points, de cada array 'Tlocal'
+de cada processo e envia-o para o processo vizinho da esquerda, e em simultâneo cada processo 
+guarda na posição mais à direita do mesmo array o valor que recebe do seu vizinho à direita.
+(este valor considera-se um ghost point para o processo que recebe).
+
+d)
+(...)
+Nx = 40000;
+Nt = 100000;
+(...)
+for (i = 0; i <= Nt-2; ++i) {
+	for (j = 1; j <= Nx-2; ++j) {
+		(...)
+	}
+	MPI_Sendrecv(&Tlocal[i+1][cols-2], 1, MPI_DOUBLE, right, 0, 
+			 	&Tlocal[i+1][0], 1, MPI_DOUBLE, left, 0, 
+				comm1, MPI_STATUS_IGNORE);
+
+	MPI_Sendrecv(&Tlocal[i+1][1], 1, MPI_DOUBLE, left, 1, 
+				&Tlocal[i+1][cols-1], 1, MPI_DOUBLE, right, 1, 
+				comm1, MPI_STATUS_IGNORE);
+}
+
+e)
+/* int MPI_Gather(const void* sendbuf, 
+				int sendcount, 
+				MPI_Datatype sendtype,
+
+				void* recvbuf, 
+				int recvcount, 
+				MPI_Datatype recvtype, 
+				
+				int root,
+				MPI_Comm comm) */
+int count = Nx/4;
+if (newid == 0)
+	perfilfinal = (int *)malloc(Nx*sizeof(double));
+
+MPI_Gather(&Tlocal[Nt-1][mystart], count, MPI_DOUBLE,
+		   &perfilfinal, count, MPI_DOUBLE,
+		   0, comm1);
+
+Para que todos os processos recebessem o array perfilfinal, bastaria usar a função 
+MPI_Allgather().
+/* int MPI_Allgather(const void* sendbuf, 
+					int sendcount,
+					MPI_Datatype sendtype, 
+
+					void* recvbuf, 
+					int recvcount,
+					MPI_Datatype recvtype, 
+
+					MPI_Comm comm) */
+int count = Nx/4;
+perfilfinal = (int *)malloc(Nx*sizeof(double));
+MPI_Allgather(Tlocal[Nt-1][mystart], count, MPI_DOUBLE,
+		   perfilfinal, count, MPI_DOUBLE, comm1);

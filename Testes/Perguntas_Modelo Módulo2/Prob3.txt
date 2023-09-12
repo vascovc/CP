@@ -1,0 +1,19 @@
+*** --- Prob3 --- ***
+
+a) Ver programa "ex3_a.c"
+
+MPI_Comm_split(MPI_COMM_WORLD, color, rank, &subcomm);
+MPI_Comm_split() vai criar tantos novos comunicadores quantas diferentes cores existirem.
+
+b) Escreva um exemplo de uma chamada de uma comunicação coletiva qualquer que
+inclua
+	i. todos os processos
+		MPI_Barrier(MPI_COMM_WORLD) ou MPI_Bcast(array, 100, MPI_INT, root, MPI_COMM_WORLD);
+	
+	ii. apenas os processos que ficaram no mesmo comunicador subcomm
+		MPI_Barrier(subcomm) ou MPI_Bcast(array, 100, MPI_INT, root, subcomm);
+
+c) A função double f2(double x, double y) deve ser executada apenas pelos processos que ficaram no terceiro dos 4 novos comunicadores. Escreva o código que faz com que isto aconteça.
+	
+	if(color == 2)
+		f2(x,y);

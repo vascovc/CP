@@ -1,0 +1,39 @@
+*** --- Prob1 --- ***
+
+a)
+/* int MPI_Ibsend(const void* buf, int count, MPI_Datatype datatype, int dest,
+				int tag, MPI_Comm comm, MPI_Request *request)*/
+if (myid == 0) {
+	
+	int buffer_size = (MPI_BSEND_OVERHEAD + N*sizeof(float));
+	char* buffer = malloc(buffer_size); // char = 1 byte
+
+	/* int MPI_Buffer_attach(void* buffer, int size) */
+	MPI_Buffer_attach(buffer, buffer_size);
+	MPI_Request request;
+	MPI_Ibsend(b, N, MPI_FLOAT, 1, 0, MPI_COMM_WORLD, &request);
+	
+	(...)
+
+	// Detach the buffer. It blocks until all messages stored are sent.
+    MPI_Buffer_detach(&buffer, &buffer_size);
+    free(buffer);
+}
+
+b)
+O envio buffered bloqueante obriga a que o processo que envia os dados, espere até estes estarem
+copiados para um buffer que apenas é utilizado para comunicar a informação que nele está contida,
+sem se efectuarem alterações nos dados.
+Após este buffer ter todos os dados que se pretendem comunicar, então o processo pode prosseguir
+e executar as instruções seguintes, desta forma a informação está segura e não é corrompida [поврежденa].
+
+Por outro lado, o envio buffered não bloqueante permite que o processo que envia os dados comece
+logo a executar as instruções seguintes ao mesmo tempo que os dados são copiados para o buffer,
+o que significa que pode dar-se o caso em que estes dados são alterados, enquanto ainda estão a
+copiados para o buffer, o que não devia acontecer.
+
+Por isto, com o buffer bloqueante não é preciso ter cuidados extra, no entanto com o buffered
+não bloqueante é preciso ter cuidados extra.
+Para resolver este problema, bastaria usar a função MPI_Wait() com o 1º parâmetro a variável
+de retorno 'request' da função MPI_Ibsend().
+A chamada para MPI_Wait() retorna apenas quando a operação identificada pelo 'request' é concluída.

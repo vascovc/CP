@@ -1,0 +1,37 @@
+*** --- Prob1 --- ***
+
+a) Como a instrução MPI_Recv() é blocking, o programa vai ficar bloqueado, pois cada processo vai ficar à espera que o outro envie a informação antes de prosseguir.
+
+Example 3.8 An errant attempt to exchange messages. ("mpi31-report.pdf")
+The receive operation of the first process must complete before its send, and can complete
+only if the matching send of the second processor is executed. The receive operation of the
+second process must complete before its send and can complete only if the matching send
+of the first process is executed. This program will always deadlock. The same holds for any
+other send mode.
+
+b) O programa vai prosseguir condicionalmente, pois como a instrução MPI_Send() decide com base no tamanho da informação a enviar se vai funcionar como um send com buffer ou um send com synchronous. 
+Se o MPI_Send() decidir enviar a informação com buffer então irá prosseguir, caso contrário ficará bloqueado à espera que o outro processo receba a informação. Se o tamanho da informação for pequeno utiliza-se buffer, se for grande utiliza-se synchronous. 
+Se o 'count' for pequeno, MPI_Send() faz buffering da mensagem e avança, caso contrário fica à espera da confirmação da receção do correspondente MPI_Recv(). 
+
+Example 3.9 An exchange that relies on buffering. ("mpi31-report.pdf")
+The message sent by each process has to be copied out before the send operation returns
+and the receive operation starts. For the program to complete, it is necessary that at least
+one of the two messages sent be buffered. Thus, this program can succeed only if the
+communication system can buffer at least count words of data.
+
+c)
+	int buffer_size = (MPI_BSEND_OVERHEAD + count*sizeof(int));
+	int* buffer = malloc(buffer_size);
+	MPI_Buffer_attach(buffer, buffer_size);
+
+	if (myid == 0) {
+		MPI_Bsend(b, count, MPI_REAL, 1, 0, comm);
+		MPI_Recv(a, count, MPI_REAL, 1, 0, comm, MPI_STATUS_IGNORE);
+	}
+	else if (myid == 1) {
+		MPI_Send(d, count, MPI_REAL, 0, 0, comm);
+		MPI_Recv(c, count, MPI_REAL, 0, 0, comm, MPI_STATUS_IGNORE);
+	}
+
+	MPI_Buffer_detach(&buffer, &buffer_size);
+	free(buffer);

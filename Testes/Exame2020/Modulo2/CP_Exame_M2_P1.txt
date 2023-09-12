@@ -1,0 +1,38 @@
+*** --- Prob1 --- ***
+
+a)
+O MPI_Ssend() obriga a uma comunicação síncrona entre o processo que envia a informação e o que recebe. Isto significa que tanto o processo 0 que envia como o 3 que recebe, tem de esperar que a comunicação conclua antes de avançar para a instrução seguinte, pois a instrução MPI_Ssend() é blocking quando a comunicação trata muitos dados. Se os dados a enviar fossem poucos, então a comunicação seria buffered.
+No que diz respeito à informação trocada neste caso, são enviados 2 000 000 números reais presentes no buffer 'b'. Em cada ciclo o valor do 'tag' é incrementado.
+
+b)
+MPI_Recv(b, 2000000, MPI_REAL, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+c)
+/* int MPI_Issend(const void* buf, int count, MPI_Datatype datatype, int dest,
+					int tag, MPI_Comm comm, MPI_Request *request) */
+MPI_Request request;
+MPI_Issend(b, 2000000, MPI_REAL, 3, i, MPI_COMM_WORLD, &request);
+
+O parâmetro extra 'request' serve para mais tarde verificar o estado da comunicação ou para esperar pela sua conclusão.
+
+d)
+/* int MPI_Wait(MPI_Request *request, MPI_Status *status) 
+A call to MPI_WAIT returns when the operation identified by request is complete.
+*/
+MPI_Status status;
+MPI_Request request;
+if  (myid == 0) {
+	for (int i = 0; i<n; ++i) {
+		MPI_Issend(b, 2000000, MPI_REAL, 3, i, MPI_COMM_WORLD, &request);
+		/* Seguem-se cálculos extensos que não alteram os valores de b */
+		(...);
+		/* Os cálculos extensos terminaram */
+		MPI_Wait(&request, &status);
+		for (int j=0; j < 2000000; ++j) 
+			b[j] = ...;
+	}
+}
+Primeiro criam-se os tipos de dados 'status' e 'request', depois utiliza-se uma comunicação síncrona non-blocking e assim podem-se executar as instruções seguintes durante o envio de dados até chegar ao ponto onde se iriam fazer alterações nesses dados, então aí chama-se a função MPI_Wait() para confirmar o estado da comunicação o verificar se já terminou, se já tiver terminado pode-se avançar, caso contrário é necessário esperar (MPI_Wait() espera) que ela termine.
+
+e)
+A vantagem do MPI_Issend() sobre o  MPI_Ssend(), é que pode executar as insturuções seguintes ao mesmo tempo que envia dados através da comunicação, desde que se tenha o cuidade de evitar que estas instruções alteram os dados enquanto estiverem a ser enviados.

@@ -1,0 +1,34 @@
+*** --- Prob3 --- ***
+
+a)
+/* int MPI_Reduce(const void* sendbuf, void* recvbuf, int count,
+				MPI_Datatype datatype, MPI_Op op, int root, MPI_Comm comm) */
+MPI_Reduce(Eparcial, Etotal, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+
+MPI_Reduce() soma os valores guardados na variável 'Eparcial' de cada processo envolvido no 
+comunicador MPI_COMM_WORLD, e retorna o resultado na variável 'Etotal' que só é acessível ao
+processo com rank=0.
+Esta linha de código tem que ser executada por todos os processos do grupo.
+
+b)
+/* int MPI_Gather(const void* sendbuf, int sendcount, MPI_Datatype sendtype,
+				  void* recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) */
+MPI_Comm comm;
+int gsize, m, new_m;
+int root, myrank, *rbuf;
+(...)
+MPI_Comm_rank(comm, &myrank);
+if (myrank == 0) {
+	MPI_Comm_size(comm, &gsize);
+	rbuf = (int *)malloc(gsize*sizeof(int));
+}
+MPI_Gather(&m, 1, MPI_INT, rbuf, 1, MPI_INT, 0, comm);
+
+if (myrank == 0) {
+	// int bufSorted[gsize];
+	sortint(rbuf, numprocs, sizeof(int));	
+}
+/* int MPI_Scatter(const void* sendbuf, int sendcount, MPI_Datatype sendtype,
+				   void* recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) */
+MPI_Scatter(rbuf, 1, MPI_INT, &new_m, 1, MPI_INT, 0, comm);
+

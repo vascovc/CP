@@ -1,0 +1,66 @@
+*** --- Prob5 --- ***
+Ver desenho junto ao enunciado!
+/* int MPI_Type_create_subarray(int ndims, const int array_of_sizes[],
+                  const int array_of_subsizes[], const int array_of_starts[],
+                  int order, MPI_Datatype oldtype, MPI_Datatype *newtype) 
+    ndims -> number of array dimensions (positive integer)
+    array_of_sizes -> number of elements of type oldtype in each dimension
+                      of the full array (array of positive integers)
+    array_of_subsizes -> number of elements of type oldtype in each dimension
+                         of the subarray (array of positive integers)
+    array_of_starts -> starting coordinates of the subarray in each dimension */
+/* Define as areas dentro do ficheiro que vão ser escritas por cada um dos processos  */
+
+/* 1º Cria-se um subarray dentro do ficheiro para escrever o pedaço da matriz global 
+   pelo qual o processo está responsável (assim define-se a parte do ficheiro que está acessível ao processo) */      
+if (rank == 0)
+	calculated_particlerow = 0;
+else
+	calculated_particlerow = N/2;
+
+// Global sizes
+gsizes[0] = N;
+gsizes[1] = 3;
+
+// Local sizes
+lsizes[0] = N/2;
+lsizes[1] = 3;
+//Global indices
+start_indices[0] = calculated_particlerow; // Se p0, calculated_particlerow = 0; se p1, calculated_particlerow = N/2
+start_indices[1] = 0;
+
+MPI_Type_create_subarray(2, gsizes, lsizes, start_indices, MPI_ORDER_C, MPI_DOUBLE, &filetype);
+MPI_Type_commit(&filetype);
+
+MPI_File fh;
+MPI_File_open(comm1d, "array.bin", MPI_MODE_CREATE | MPI_MODE_WRONLY, MPI_INFO_NULL, &fh);
+
+/* int MPI_File_set_view(MPI_File fh, MPI_Offset disp, MPI_Datatype etype,
+						MPI_Datatype filetype, const char *datarep, MPI_Info info) */
+MPI_File_set_view(fh, 0, MPI_DOUBLE, filetype, "native", MPI_INFO_NULL);
+
+/* 2º Cria-se um subarray dentro do array 'parts' para escrever o pedaço que interessa 
+   no ficheiro */
+if (rank == 0) {
+	memsizes[0] = N0;
+	start_indices[0] = 0;
+}
+else {
+	memsizes[0] = N1;
+	start_indices[0] = N1-N/2;
+}
+// Global size do array 'parts'
+memsizes[1] = 7;
+// Local sizes
+lsizes[0] = N/2;
+lsizes[1] = 3;
+// Global Indexes
+start_indices[1] = 1;
+      
+MPI_Type_create_subarray(2, memsizes, lsizes, start_indices, MPI_ORDER_C, MPI_DOUBLE, &memtype);
+MPI_Type_commit(&memtype);
+
+/* int MPI_File_write_all(MPI_File fh, const void *buf, int count,
+						  MPI_Datatype datatype, MPI_Status *status) */
+MPI_File_write_all(fh, parts, 1, memtype, MPI_STATUS_IGNORE);
+MPI_File_close(&fh);

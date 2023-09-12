@@ -1,0 +1,13 @@
+a) 	A variável vmax não pode ser partilhada entre threads, pois isso leva a valores errados serem escitos nela, por isso vmax tem de ser uma variável privada apenas acessível por cada thread e só no fim se pode reduzir todas as variáveis vmax quando todos os threads tiverem terminado as suas operações individuais nela. 
+	Em relação ao processo de redução em si, a instrução #pragma omp critical, deveria ir depois dos ciclos de actualização de vmax terminarem, para finalmente todos os threads actualizarem uma variável global, a definir, com o seu valor de vmax, fazendo uma operação de comparação para se encontrar o maior valor de vmax guardado entre os threads.
+
+b)
+
+vmax = v[0];
+#pragma omp parallel for reducion(max:vamx)
+for(i=1; i<N; i++) {
+	if(v[i]>vmax)
+		vmax = v[i];
+}
+
+Dentro do ambiente paralelo em que o programa está a correr, é feita uma cópia local de vmax inicializada com o valor correspondente à operação max da clausula reduction. As actualizações de vmax em cada thread ocorrem na cópia local de vmax, assim no final cada thread vai ter um vmax com o maior valor que encontrou, sendo depois os vmax de todos os threads comparados entre si e com o vmax inicial vmax=v[0], a fim de determinar o maior valor de vmax encontrado entre todos os threads.

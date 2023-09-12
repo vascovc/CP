@@ -1,0 +1,24 @@
+*** --- Prob2 --- ***
+
+a) Em vez de se enviar um elemento de cada vez, cria-se um novo datatype que engloba todos os elementos e envia-se apenas um "elemento" desse novo datatype, onde seguem todos os elementos do datatype antigo. Quem recebe não vê a diferença e recebe o stream de informação como seria com o datatype antigo.
+
+Send() sem criar um novo datatype seria:
+	MPI_Send(source, count, MPI_DOUBLE, 1, 0, comm);
+
+b)
+	MPI_Datatype vtype;
+	if (myid == 0) {
+	/* 
+	int MPI_Type_vector(int count, int blocklength, int stride, MPI_Datatype oldtype, MPI_Datatype *newtype) 
+		count -> number of blocks (non-negative integer)
+		blocklength -> number of elements in each block (non-negative integer)
+		stride -> number of elements between start of each block (integer)
+	*/
+		MPI_Type_vector(count, 1, 3, MPI_DOUBLE, &vtype);
+		MPI_Type_commit(&vtype);
+		MPI_Send(&source[2], 1, vtype, 1, 0, comm);
+		MPI_Type_free(&vtype);
+	}
+	else if (myid == 1) {
+		MPI_Recv(target, count, MPI_DOUBLE, 0, 0, comm, MPI_STATUS_IGNORE);
+	}

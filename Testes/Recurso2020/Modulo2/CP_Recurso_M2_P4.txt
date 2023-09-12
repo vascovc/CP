@@ -1,0 +1,47 @@
+*** --- Prob4 --- ***
+
+/* int MPI_Cart_shift(MPI_Comm comm, int direction, int disp,
+						int *rank_source, int *rank_dest) */
+a)
+int newid, nbrbottom, nbrtop, nbrleft, nbrright;
+MPI_Comm_rank(comm1, &newid);
+MPI_Cart_shift(comm1, 0,  1, &nbrtop, &nbrbottom);
+MPI_Cart_shift(comm1, 1,  1, &nbrleft, &nbrright);
+
+b)
+/* int MPI_Sendrecv(const void *sendbuf, 
+  						int sendcount, 
+  						MPI_Datatype sendtype, 
+  						int dest, 
+  						int sendtag, 
+
+  						void *recvbuf, 
+  						int recvcount,
+						MPI_Datatype recvtype, 
+						int source, 
+						int recvtag, 
+						MPI_Comm comm,
+						MPI_Status *status) */
+MPI_Sendrecv(&nbrtop, 1, MPI_INT, nbrleft, 0, 
+			 &topright, 1, MPI_INT, nbrright, 0, comm2d, MPI_STATUS_IGNORE);
+
+c)
+Ao inicializar o valor de identificação do vizinho no campo superior direito a MPI_PROC_NULL,
+está-se a garantir que os processos que pertencem ao linha de topo ou ao coluna mais à direita
+da grelha Cartesiana 2D ficam com esse valor na variável 'topright' depois de terem executado o
+MPI_Sendrecv().
+Isto deve-se ao facto de para uma decomposição do dominio não periódica os processos nas
+“extremidades” não estão conectados (por exemplo, o processo no canto superior direito não tem
+o vizinho da sua direita nem do topo).  
+
+d)
+Quando o comunicador não é periódico, essencialmente significa que não há condições fronteira
+periódicas relativamente aos processos, ou seja o processo mais em cima não tem como vizinho
+o processo mais em baixo e vice-versa.
+Para além disto, o processo mais à direita não tem como vizinho à direita o processo mais à 
+esquerda e vice-versa.
+
+Caso o comunicador cartesiano fosse periódico, os processos que se encontram na linha do topo 
+ou na coluna mais à direita da grelha Cartesiana 2D teriam o seu vizinho próximo diagonal à 
+direita e em cima. 
+O que não se verifica par um comunicador cartesiano não periódico.

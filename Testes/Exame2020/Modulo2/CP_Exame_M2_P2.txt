@@ -1,0 +1,44 @@
+*** --- Prob2 --- ***
+Ver desenho do array no feito na folha do enunciado
+
+a)  
+/* int MPI_Type_vector(int count, int blocklength, int stride, MPI_Datatype oldtype, 								MPI_Datatype *newtype)
+count -> number of blocks (non-negative integer)
+blocklength -> number of elements in each block (non-negative integer)
+stride -> number of elements between start of each block (integer)
+oldtype -> old datatype (handle)
+newtype -> new datatype (handle)
+*/
+
+MPI_Datatype vtype;
+MPI_Type_vector(m/2, m/2, m, MPI_DOUBLE, &vtype);
+MPI_Type_commit(&vtype);
+MPI_Send(&gr[m/2][m/2], 1, vtype, 0, 0, MPI_COMM_WORLD);
+MPI_Type_free(&vtype);
+
+b)
+/* int MPI_Type_create_subarray(int ndims, const int array_of_sizes[],
+                  const int array_of_subsizes[], const int array_of_starts[],
+                  int order, MPI_Datatype oldtype, MPI_Datatype *newtype) 
+    
+    ndims -> number of array dimensions (positive integer)
+    array_of_sizes -> number of elements of type oldtype in each dimension
+                      of the full array (array of positive integers)
+    array_of_subsizes -> number of elements of type oldtype in each dimension
+                         of the subarray (array of positive integers)
+    array_of_starts -> starting coordinates of the subarray in each dimension */
+
+gsizes[0] = m;
+gsizes[1] = m;
+
+lsizes[0] = m/2;
+lsizes[1] = m/2;
+
+start_indices[0] = m/2;
+start_indices[1] = m/2;
+
+MPI_Datatype stype;
+MPI_Type_create_subarray(2, gsizes, lsizes, start_indices, MPI_ORDER_C, MPI_DOUBLE, &stype);
+MPI_Type_commit(&stype);
+MPI_Send(&gr, 1, stype, 0, 0, MPI_COMM_WORLD);
+MPI_Type_free(&stype); 
